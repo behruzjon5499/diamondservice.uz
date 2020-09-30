@@ -1,16 +1,22 @@
 <?php
 
-/* @var $this yii\web\View */
+/**
+ * @var $about About
+ */
 
-use yii\helpers\Html;
+use backend\models\About;
+use diamondservice\helpers\LanguageHelper;
 
-$this->title = 'About';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-about">
-    <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>This is the About page. You may modify the following file to customize its content:</p>
+<div class="wrapper">
+    <div class="container">
+        <div class="wrapper_thumb" style="background-image: url(<?= $about->getImageFileUrl('photo') ?>);"></div>
+        <h1><?= Yii::t('app', 'О компании') ?></h1>
 
-    <code><?= __FILE__ ?></code>
+        <p>
+            <?= LanguageHelper::get($about, 'description'); ?>
+        </p>
+
+</div>
 </div>

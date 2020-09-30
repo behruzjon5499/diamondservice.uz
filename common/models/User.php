@@ -3,14 +3,45 @@ namespace common\models;
 
 use Yii;
 use yii\base\NotSupportedException;
+use yii\behaviors\AttributeBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use yii\web\UploadedFile;
+use yiidreamteam\upload\ImageUploadBehavior;
+
+/**
+ * This is the model class for table "user".
+ *
+ * @property int $id
+ * @property string $first_name
+ * @property string $last_name
+ * @property string|null $address
+ * @property string|null $phone
+ * @property string|null $main_photo
+ * @property string $username
+ * @property string $auth_key
+ * @property string $password_hash
+ * @property string|null $password_reset_token
+ * @property string|null $email
+ * @property int $status
+ * @property int $created_at
+ * @property int $updated_at
+ * @property string|null $verification_token
+ *
+ * @property Comments[] $comments
+ * @property Posts[] $posts
+ */
 
 /**
  * User model
  *
- * @property integer $id
+ * @property int $id
+ * @property string $first_name
+ * @property string $last_name
+ * @property string|null $address
+ * @property string|null $phone
+ * @property string|null $main_photo
  * @property string $username
  * @property string $password_hash
  * @property string $password_reset_token
@@ -27,6 +58,8 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
+    public $date;
+    public $password;
 
 
     /**
@@ -40,12 +73,6 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
-    {
-        return [
-            TimestampBehavior::className(),
-        ];
-    }
 
     /**
      * {@inheritdoc}
@@ -53,9 +80,56 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            ['status', 'default', 'value' => self::STATUS_INACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
+            [['first_name', 'last_name', 'username'], 'required'],
+            [['first_name', 'last_name', 'address', 'phone', 'username', 'email'], 'string', 'max' => 255],
+            [['username'], 'unique'],
+            [['email'], 'unique'],
+            ['password', 'required'],
+            ['password', 'string', 'min' => 6],
+            ['main_photo', 'image', 'extensions' => 'jpeg, png, jpg, gif', 'skipOnEmpty' => true, 'checkExtensionByMimeType' => true],
         ];
+    }
+
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => AttributeBehavior::class,
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['date'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['date'],
+                ],
+                'value' => function ($event) {
+                    return strtotime($this->date);
+                },
+            ],
+            TimeStampBehavior::class,
+            [
+                'class' => ImageUploadBehavior::class,
+                'attribute' => 'main_photo',
+                'createThumbsOnRequest' => true,
+                'filePath' => '@storageRoot/store/[[attribute_id]]/[[filename]].[[extension]]',
+                'fileUrl' => '@storageHostInfo/store/[[attribute_id]]/[[filename]].[[extension]]',
+                'thumbPath' => '@storageRoot/cache/[[attribute_id]]/[[profile]]_[[filename]].[[extension]]',
+                'thumbUrl' => '@storageHostInfo/cache/[[attribute_id]]/[[profile]]_[[filename]].[[extension]]',
+                'thumbs' => [
+                    's16' => ['width' => 16, 'height' => 16],
+                    's32' => ['width' => 32, 'height' => 32],
+                    's48' => ['width' => 48, 'height' => 48],
+                    's128' => ['width' => 128, 'height' => 128],
+                    's160' => ['width' => 160, 'height' => 160],
+                ],
+            ],
+        ];
+    }
+    public function beforeValidate()
+    {
+        if (parent::beforeValidate()) {
+            $this->main_photo = UploadedFile::getInstance($this, 'main_photo');
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -208,5 +282,24 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+    public function signup()
+    {
+        if (!$this->validate()) {
+            return null;
+        }
+        $user = new User();
+        $user->first_name = $this->first_name;
+        $user->last_name = $this->last_name;
+        $user->address = $this->address;
+        $user->phone = $this->phone;
+        $user->main_photo = $this->main_photo;
+        $user->username = $this->username;
+        $user->email = $this->email;
+        $user->setPassword($this->password);
+        $user->generateAuthKey();
+        $user->generateEmailVerificationToken();
+        return $user->save();
+
     }
 }

@@ -10,6 +10,7 @@ return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'language' => 'ru',
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'request' => [
@@ -44,6 +45,11 @@ return [
             ],
         ],
         */
+        'backendUrlManager' => require __DIR__ . '/../../backend/config/urlManager.php',
+        'frontendUrlManager' => require __DIR__ . '/urlManager.php',
+        'urlManager' => function () {
+            return Yii::$app->get('frontendUrlManager');
+        },
     ],
     'params' => $params,
 ];

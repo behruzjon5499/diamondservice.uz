@@ -1,4 +1,7 @@
 <?php
+
+use yii\filters\AccessControl;
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -13,6 +16,13 @@ return [
     'bootstrap' => ['log'],
     'modules' => [],
     'components' => [
+        'view' => [
+            'theme' => [
+                'pathMap' => [
+                    '@backend/views' => '@backend/views/yii2-app'
+                ],
+            ],
+        ],
         'request' => [
             'csrfParam' => '_csrf-backend',
         ],
@@ -37,6 +47,24 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'backendUrlManager' => require __DIR__ . '/urlManager.php',
+        'frontendUrlManager' => require __DIR__ . '/../../frontend/config/urlManager.php',
+        'urlManager' => function () {
+            return Yii::$app->get('backendUrlManager');
+        },
+    ],
+        'controllerMap' => [
+            'elfinder' => [
+                'class' => 'mihaildev\elfinder\PathController',
+                'access' => ['@'],
+                'root' => [
+                    'baseUrl' => $params['storageHostInfo'],
+                    'basePath' => '@storage',
+                    'path' => 'elfinder-files',
+                    'name' => 'Files',
+                ],
+            ],
+        ],
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,
@@ -45,6 +73,17 @@ return [
             ],
         ],
         */
+
+    'as access' => [
+    'class' => AccessControl::class,
+    'except' => ['auth/login', 'site/error'],
+    'rules' => [
+        [
+            'allow' => true,
+//            'roles' => ['admin'],
+        ],
     ],
+
+],
     'params' => $params,
 ];

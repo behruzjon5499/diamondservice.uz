@@ -1,6 +1,12 @@
 <?php
 namespace frontend\controllers;
 
+use abdualiym\slider\entities\Slides;
+use backend\models\About;
+use backend\models\Categories;
+use backend\models\CategoriesKartridjey;
+use backend\models\Services;
+use backend\models\ServicesKartridjey;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -74,7 +80,12 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        return $this->render('index',[
+            'categories' => Categories::find()->all(),
+            'homeslider' => Slides::getBySlug('homeslider'),
+            'homeabout' => Slides::getBySlug('homeabout'),
+            'about' => About::find()->one(),
+        ]);
     }
 
     /**
@@ -82,35 +93,35 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionLogin()
-    {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        } else {
-            $model->password = '';
-
-            return $this->render('login', [
-                'model' => $model,
-            ]);
-        }
-    }
+//    public function actionLogin()
+//    {
+//        if (!Yii::$app->user->isGuest) {
+//            return $this->goHome();
+//        }
+//
+//        $model = new LoginForm();
+//        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+//            return $this->redirect(['/cabinet']);
+//        } else {
+//            $model->password = '';
+//
+//            return $this->render('login', [
+//                'model' => $model,
+//            ]);
+//        }
+//    }
 
     /**
      * Logs out the current user.
      *
      * @return mixed
      */
-    public function actionLogout()
-    {
-        Yii::$app->user->logout();
-
-        return $this->goHome();
-    }
+//    public function actionLogout()
+//    {
+//        Yii::$app->user->logout();
+//
+//        return $this->goHome();
+//    }
 
     /**
      * Displays contact page.
@@ -118,22 +129,22 @@ class SiteController extends Controller
      * @return mixed
      */
     public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
-            } else {
-                Yii::$app->session->setFlash('error', 'There was an error sending your message.');
-            }
-
-            return $this->refresh();
+{
+    $model = new ContactForm();
+    if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
+            Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
         } else {
-            return $this->render('contact', [
-                'model' => $model,
-            ]);
+            Yii::$app->session->setFlash('error', 'There was an error sending your message.');
         }
+
+        return $this->refresh();
+    } else {
+        return $this->render('contact', [
+            'model' => $model,
+        ]);
     }
+}
 
     /**
      * Displays about page.
@@ -142,9 +153,30 @@ class SiteController extends Controller
      */
     public function actionAbout()
     {
-        return $this->render('about');
-    }
 
+        return $this->render('about',[
+            'about' => About::find()->one(),
+        ]);
+    }
+    public function actionPricelist()
+    {
+
+        return $this->render('pricelist',[
+            'categoriesremont' => Categories::find()->all(),
+            'categorieskartridjey' => CategoriesKartridjey::find()->all(),
+            'services' => Services::find()->all(),
+            'serviceskartridjey' => ServicesKartridjey::find()->all(),
+            'sliderprice' => Slides::getBySlug('pricelist'),
+
+        ]);
+    }
+    public function actionClient()
+    {
+        return $this->render('client',[
+            'sliderclient' => Slides::getBySlug('clients'),
+            'ourclients' => Slides::getBySlug('ourclients'),
+        ]);
+    }
     /**
      * Signs user up.
      *
@@ -153,6 +185,7 @@ class SiteController extends Controller
     public function actionSignup()
     {
         $model = new SignupForm();
+        
         if ($model->load(Yii::$app->request->post()) && $model->signup()) {
             Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');
             return $this->goHome();

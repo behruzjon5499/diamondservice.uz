@@ -1,0 +1,29 @@
+@blue: #5DA2E6;
+
+@green: #2E915D;
+@black: #222222;
+.tr(@s:.5s){
+	-webkit-transition: ease @s;
+	-o-transition: ease @s;
+	transition: ease @s;
+}
+.df(){
+	display: -webkit-flex;
+	display: -moz-flex;
+	display: -ms-flex;
+	display: -o-flex;
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+}
+.fb(@w){
+	flex-basis: @w;
+	flex: 0 0 @w;
+	width: @w;
+	max-width: @w;
+}
+.bg(){
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+} 

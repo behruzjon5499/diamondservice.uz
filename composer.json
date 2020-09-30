@@ -13,20 +13,34 @@
         "source": "https://github.com/yiisoft/yii2"
     },
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">=5.6.0",
         "yiisoft/yii2": "~2.0.14",
         "yiisoft/yii2-bootstrap": "~2.0.0",
-        "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0"
+        "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
+        "dmstr/yii2-adminlte-asset": "^2.1",
+        "codemix/yii2-localeurls": "^1.7",
+        "yii-dream-team/yii2-upload-behavior": "^1.1",
+        "mihaildev/yii2-elfinder": "1.2.2",
+        "mihaildev/yii2-ckeditor": "1.0.1",
+        "kartik-v/yii2-widget-datetimepicker": "v1.4.8",
+        "kartik-v/yii2-widget-fileinput": "v1.0.8",
+        "abdualiym/yii2-cms": "^2.0",
+        "abdualiym/yii2-slider": "^2.0",
+        "abdualiym/yii2-block": "^1.1",
+        "abdualiym/yii2-language": "^1.0",
+        "himiklab/yii2-recaptcha-widget" : "2.*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
         "yiisoft/yii2-gii": "~2.1.0",
         "yiisoft/yii2-faker": "~2.0.0",
-        "codeception/codeception": "^4.0",
+        "codeception/codeception": "4.0.x-dev | ^4.0",
         "codeception/module-asserts": "^1.0",
         "codeception/module-yii2": "^1.0",
         "codeception/module-filesystem": "^1.0",
+        "phpunit/phpunit": "~7.0",
         "codeception/verify": "~0.5.0 || ~1.1.0",
         "symfony/browser-kit": ">=2.7 <=4.2.4"
     },
